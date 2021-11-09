@@ -1,2 +1,31 @@
+syntax = "proto3";
 package DiMutex; 
 option go_package = "https://github.com/kaeppen/disys-mandatory2;DiMutex";
+
+
+service DiMutex {
+    rpc RequestAccess (AccessRequest) returns (AccessGrant) {} //when a node wants access
+    //rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess? 
+    rpc ReleaseAccess (ReleaseMessage) returns (ReleaseMessage) {} //when a node releases its access 
+}
+
+//overvej at simplificere til 1 max 2 slags beskeder 
+
+message AccessRequest {
+    string Message = 1;
+    int32 Lamport = 2; 
+    int32 Id = 3; //overvej denne 
+}
+
+//to indicate whether a node was given access?
+message AccessGrant {
+    int32 Id = 1; 
+    bool AccessGranted = 2; 
+}
+
+message ReleaseMessage {
+    string Message = 1; //ikke nødvendigt, men lidt nice
+    int32 Lamport = 2; //hvornår blev der anmodet om release/rent faktisk released 
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative chittychat.proto 
