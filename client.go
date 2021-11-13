@@ -18,7 +18,7 @@ const (
 	port = "???"
 )
 
-func main() {
+func maineru() {
 	//hvordan skal opsætning af
 
 	c := diMutexClient{}
