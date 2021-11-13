@@ -16,7 +16,7 @@ type diMutexClient struct {
 	state     State
 	timestamp int
 	ctx       context.Context
-	peers     []grpc.ClientConn
+	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
 }
 
 const (
@@ -37,6 +37,7 @@ func main() {
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
+	setupConnection(&c)
 
 }
 
@@ -71,11 +72,17 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, 
 	//nu skal vi på en måde tale med alle og finde "vinderen"
 	peers := c.peers
 	for i := 0; i < len(peers); i++ {
-		//peers[i].Connect()
-		//peers[i].Invoke()
+		answer, err := peers[i].AnswerRequest(ctx, *d.Empty{})
+		//logik her som bestemmer hvem der vinder
 	}
 	//compiler gets happy
 	return nil, nil
+}
+
+func (c *diMutexClient) AnswerRequest(ctx context.Context) (*d.RequestAnswer, error) {
+	c.timestamp++                                                     //increment before sending a message
+	answer := &d.RequestAnswer{Lamport: int32(c.timestamp), Id: 9000} //bogus id for now
+	return answer, nil
 }
 
 //"konverterer" serf-medlemmer til grpc-forbindelser (måske virker det? måske er det for overkompliceret?)
@@ -88,7 +95,7 @@ func setupConnection(c *diMutexClient) {
 			log.Fatalf("Could not connect: %s", err)
 
 		}
-		c.peers[i] = *conn
+		c.peers[i] = d.NewDiMutexClient(conn)
 	}
 
 }
