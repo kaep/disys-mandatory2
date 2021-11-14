@@ -105,10 +105,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.E
 }
 
 func hasPrecedence(own int, recieved int) bool {
-	if own > recieved {
-		return true
-	}
-	return false
+	return own > recieved
 }
 
 func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequest) (*d.RequestAnswer, error) {
