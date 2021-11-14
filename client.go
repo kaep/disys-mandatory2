@@ -43,7 +43,7 @@ func main() {
 	//ctx := context.Background()
 	select {
 	case <-waiter:
-		setupConnection(&c)
+		//setupConnection(&c)
 		for {
 			fmt.Printf("Hello world!")
 		}
