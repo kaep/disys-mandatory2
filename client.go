@@ -19,7 +19,7 @@ type diMutexClient struct {
 	timestamp int
 	ctx       context.Context
 	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
-	name string 
+	name      string
 }
 
 func main() {
@@ -41,8 +41,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer cluster.Leave()
-	name = os.Getenv(("NAME")
 	c := diMutexClient{}
+	c.name = os.Getenv("NAME")
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
@@ -90,7 +90,7 @@ func GetAccess(message string, c *diMutexClient) {
 
 //The "multicast" part of the algorithm
 func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, opts ...grpc.CallOption) (*d.AccessGrant, error) {
-	log.Printf("%v requesting access to cs", c)
+	log.Printf("%v requesting access to cs", c.name)
 	//bump own clock before sending out the message
 	c.timestamp++
 	//set own state to wanted
@@ -114,13 +114,13 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, 
 }
 
 func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.Empty {
-	log.Printf("%v has gotten access to cs", c.cluster.)
+	log.Printf("%v has gotten access to cs", c.name)
 	c.state = Held
 	//Hold the critical section for 7 seconds
 	time.Sleep(7 * time.Second)
 	//Release it
 	c.state = Released
-	log.Printf("%v has released cs", c)
+	log.Printf("%v has released cs", c.name)
 
 	//maybe broadcast
 

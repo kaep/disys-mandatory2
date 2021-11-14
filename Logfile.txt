@@ -4,3 +4,7 @@
 
 2021/11/14 19:05:54 &{0xc0000d6180 0 0 0xc000024040 []} requesting access to cs
 2021/11/14 19:05:54 &{0xc0000d6180 1 1 0xc000024040 []} has gotten access to cs
+2021/11/14 19:41:14 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
