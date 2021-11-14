@@ -4,27 +4,39 @@ services:
     client-1: 
         container_name: "dimutex_1"
         image: dimutex:latest
+        build: 
+            dockerfile: ./Dockerfile
         environment: 
             - ADVERTISE_ADDR=172.17.0.2
             - NAME="Henning"
+            - ID = "1"
     client-2: 
         container_name: "dimutex_2"
         image: dimutex:latest
+        build: 
+            dockerfile: ./Dockerfile
         environment: 
             - ADVERTISE_ADDR=172.17.0.3
             - CLUSTER_ADDR=172.17.0.2
             - NAME="Mikki"
+            - ID = "2"
     client-3: 
         container_name: "dimutex_3"
         image: dimutex:latest
+        build: 
+            dockerfile: ./Dockerfile
         environment: 
             - ADVERTISE_ADDR=172.17.0.4
             - CLUSTER_ADDR=172.17.0.2
-            - NAME="Jens"        
+            - NAME="Jens"
+            - ID = "3"        
     client-4: 
         container_name: "dimutex_4"
         image: dimutex:latest
+        build: 
+            dockerfile: ./Dockerfile
         environment: 
             - ADVERTISE_ADDR=172.17.0.5
             - CLUSTER_ADDR=172.17.0.2
             - NAME="Børge"        
+            - ID = "4"

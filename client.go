@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/hashicorp/serf/serf"
@@ -20,6 +21,7 @@ type diMutexClient struct {
 	ctx       context.Context
 	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
 	name      string
+	id        int
 }
 
 func main() {
@@ -43,6 +45,7 @@ func main() {
 	defer cluster.Leave()
 	c := diMutexClient{}
 	c.name = os.Getenv("NAME")
+	c.id, _ = strconv.Atoi(os.Getenv("ID"))
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
