@@ -41,16 +41,14 @@ func main() {
 	c.ctx = context.Background()
 	waiter := time.Tick(2 * time.Second)
 	//ctx := context.Background()
-	for {
-		select {
-		case <-waiter:
-			setupConnection(&c)
-			for {
-				fmt.Printf("Hello world!")
-			}
-			//ctx, _ := context.WithTimeout(ctx, time.Second*2)
-
+	select {
+	case <-waiter:
+		setupConnection(&c)
+		for {
+			fmt.Printf("Hello world!")
 		}
+		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
+
 	}
 	//setupConnection(&c)
 	//for {
