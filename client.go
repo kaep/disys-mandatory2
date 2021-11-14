@@ -54,10 +54,13 @@ func main() {
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 	}
-	request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
-	c.RequestAccess(c.ctx, request)
-	for {
 
+	for {
+		select {
+		case <-waiter:
+			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+			c.RequestAccess(c.ctx, request)
+		}
 	}
 
 	// for {
