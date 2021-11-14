@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"log"
 	"os"
@@ -38,7 +37,7 @@ func main() {
 	c.cluster = cluster
 	waiter := time.Tick(2 * time.Second)
 	//ctx := context.Background()
-	scanner := bufio.NewScanner(os.Stdin)
+	//scanner := bufio.NewScanner(os.Stdin)
 	select {
 	case <-waiter:
 		setupConnection(&c)
