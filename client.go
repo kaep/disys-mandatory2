@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -24,7 +25,7 @@ type diMutexClient struct {
 func main() {
 	//set up logging
 	//os.Remove("../Logfile.txt") //Delete the file to ensure a fresh log for every session
-	f, erro := os.OpenFile("../Logfile.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	f, erro := os.OpenFile("./Logfile.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if erro != nil {
 		log.Fatalf("Logfile error")
 	}
@@ -54,13 +55,23 @@ func main() {
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 	}
+	var input string
 	for {
-		//scanner.Scan()
-		//if scanner.Text() == "get" {
-		request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
-		c.RequestAccess(c.ctx, request)
-		//}
+		fmt.Scanln(&input)
+		if input == "get" {
+			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+			c.RequestAccess(c.ctx, request)
+		}
+
 	}
+
+	// for {
+	// 	//scanner.Scan()
+	// 	//if scanner.Text() == "get" {
+	// 	request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+	// 	c.RequestAccess(c.ctx, request)
+	// 	//}
+	// }
 
 	//setupConnection(&c)
 	//for {
