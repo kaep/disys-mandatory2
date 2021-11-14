@@ -1,0 +1,7 @@
+version: '3'
+
+services: 
+    client-1: &client
+        image: dimutex:latest
+    client-2: 
+        <<: *client
