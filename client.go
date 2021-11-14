@@ -45,8 +45,11 @@ func main() {
 	case <-waiter:
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
-
 	}
+	for {
+		//keep alive
+	}
+
 	//setupConnection(&c)
 	//for {
 	//	fmt.Printf("Hello world!")
