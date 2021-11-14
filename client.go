@@ -40,7 +40,9 @@ func main() {
 	c.timestamp = 0
 	c.ctx = context.Background()
 	setupConnection(&c)
-	fmt.Printf("Hello world!")
+	for {
+		fmt.Printf("Hello world!")
+	}
 
 }
 
