@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -21,6 +22,16 @@ type diMutexClient struct {
 }
 
 func main() {
+	//set up logging
+	//os.Remove("../Logfile.txt") //Delete the file to ensure a fresh log for every session
+	f, erro := os.OpenFile("../Logfile.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if erro != nil {
+		log.Fatalf("Logfile error")
+	}
+	defer f.Close()
+	wrt := io.MultiWriter(os.Stdout, f)
+	log.SetOutput(wrt)
+
 	//These addresses work with the dockerfile from the example
 	cluster, err := setupCluster(
 		os.Getenv("ADVERTISE_ADDR"),
@@ -86,6 +97,7 @@ func GetAccess(message string, c *diMutexClient) {
 
 //The "multicast" part of the algorithm
 func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, opts ...grpc.CallOption) (*d.AccessGrant, error) {
+	log.Printf("%v requesting access to cs", c)
 	//bump own clock before sending out the message
 	c.timestamp++
 	//set own state to wanted
@@ -109,6 +121,7 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, 
 }
 
 func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.Empty {
+	log.Printf("%v has gotten access to cs", c)
 	c.state = Held
 	//Hold the critical section for 7 seconds
 	time.Sleep(7 * time.Second)
