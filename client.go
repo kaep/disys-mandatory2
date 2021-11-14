@@ -39,6 +39,7 @@ func main() {
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
+	c.cluster = cluster
 	waiter := time.Tick(2 * time.Second)
 	//ctx := context.Background()
 	select {
@@ -46,6 +47,7 @@ func main() {
 		//setupConnection(&c)
 		for {
 			fmt.Printf("Hello world!")
+			setupConnection(&c)
 		}
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 
