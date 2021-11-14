@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"log"
 	"os"
@@ -37,13 +38,17 @@ func main() {
 	c.cluster = cluster
 	waiter := time.Tick(2 * time.Second)
 	//ctx := context.Background()
+	scanner := bufio.NewScanner(os.Stdin)
 	select {
 	case <-waiter:
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 	}
-	for {
-		//keep alive
+	for scanner.Scan() {
+		if scanner.Text() == "get" {
+			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+			c.RequestAccess(c.ctx, request)
+		}
 	}
 
 	//setupConnection(&c)
