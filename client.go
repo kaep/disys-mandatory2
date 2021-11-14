@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -44,11 +43,7 @@ func main() {
 	//ctx := context.Background()
 	select {
 	case <-waiter:
-		//setupConnection(&c)
-		for {
-			fmt.Printf("Hello world!")
-			setupConnection(&c)
-		}
+		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 
 	}
