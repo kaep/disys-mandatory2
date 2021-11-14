@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/hashicorp/serf/serf"
 	d "github.com/kaeppen/disys-mandatory2/dimutex"
@@ -67,25 +68,63 @@ func GetAccess(message string, c *diMutexClient) {
 	c.RequestAccess(c.ctx, request)
 }
 
-//det her er "multicast" delen af algoritmen
+//The "multicast" part of the algorithm
 func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, opts ...grpc.CallOption) (*d.AccessGrant, error) {
-	//nu skal vi på en måde tale med alle og finde "vinderen"
+	//bump own clock before sending out the message
+	c.timestamp++
+	//set own state to wanted
+	c.state = Wanted
+
+	replies := 0
 	peers := c.peers
 	for i := 0; i < len(peers); i++ {
-		answer, err := peers[i].AnswerRequest(ctx, *d.Empty{})
-		//logik her som bestemmer hvem der vinder
+		answer, err := peers[i].AnswerRequest(ctx, in)
+		if answer != nil && err != nil {
+			replies++
+		}
 	}
-	//compiler gets happy
+	//if i receive N-1 replies, then i can have the critical section
+	if replies == len(peers) {
+		c.HoldAndRelease(ctx, &d.Empty{})
+	}
+
+	//compiler gets happy -> revisit return value
 	return nil, nil
 }
 
-func (c *diMutexClient) AnswerRequest(ctx context.Context) (*d.RequestAnswer, error) {
-	c.timestamp++                                                     //increment before sending a message
-	answer := &d.RequestAnswer{Lamport: int32(c.timestamp), Id: 9000} //bogus id for now
-	return answer, nil
+func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.Empty {
+	c.state = Held
+	//Hold the critical section for 7 seconds
+	time.Sleep(7 * time.Second)
+	//Release it
+	c.state = Released
+
+	//maybe broadcast
+
+	return nil //wrong?
 }
 
-//"konverterer" serf-medlemmer til grpc-forbindelser (måske virker det? måske er det for overkompliceret?)
+func hasPrecedence(own int, recieved int) bool {
+	if own > recieved {
+		return true
+	}
+	return false
+}
+
+func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequest) (*d.RequestAnswer, error) {
+	c.timestamp++ //increment before doing anything
+	//if this node already has access or wants it and also has "more right"
+	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, int(request.Lamport))) {
+		//queue the request from other node
+		return nil, nil //return value?
+	} else {
+		//else, just send a reply
+		answer := &d.RequestAnswer{}
+		return answer, nil
+	}
+}
+
+//"converts" serf members to grpc clients
 func setupConnection(c *diMutexClient) {
 	members := getOtherMembers(c.cluster)
 	for i := 0; i < len(members); i++ {
