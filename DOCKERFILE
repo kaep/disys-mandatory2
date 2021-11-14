@@ -1,0 +1,13 @@
+FROM golang:latest
+
+RUN mkdir /build
+WORKDIR /build
+
+
+RUN export GO111MODULE=on
+
+COPY go.mod /build
+COPY go.sum /build/
+
+RUN cd /build/ && git clone https://github.com/kaeppen/disys-mandatory2.git 
+RUN cd /build/disys-mandatory2 && go build ./...
