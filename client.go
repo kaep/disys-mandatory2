@@ -44,7 +44,8 @@ func main() {
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 	}
-	for scanner.Scan() {
+	for {
+		scanner.Scan()
 		if scanner.Text() == "get" {
 			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
 			c.RequestAccess(c.ctx, request)
