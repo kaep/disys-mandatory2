@@ -88,7 +88,7 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, 
 		c.HoldAndRelease(ctx, &d.Empty{})
 	}
 
-	//compiler gets happy -> revisit return value
+	//compiler gets happy -> revisit return
 	return nil, nil
 }
 
