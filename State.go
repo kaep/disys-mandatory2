@@ -1,6 +1,6 @@
 package main
 
-type State int64
+type State int32
 
 const (
 	Released State = iota
