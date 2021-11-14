@@ -1,5 +1,5 @@
 syntax = "proto3";
-package DiMutex; 
+package dimutex; 
 option go_package = "https://github.com/kaeppen/disys-mandatory2;dimutex";
 
 
