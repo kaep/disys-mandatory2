@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -39,10 +38,17 @@ func main() {
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
-	setupConnection(&c)
+	waiter := time.Tick(2 * time.Second)
 	for {
-		fmt.Printf("Hello world!")
+		select {
+		case <-waiter:
+			setupConnection(&c)
+		}
 	}
+	//setupConnection(&c)
+	//for {
+	//	fmt.Printf("Hello world!")
+	//}
 
 }
 
