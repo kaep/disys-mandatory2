@@ -135,16 +135,14 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 //"converts" serf members to grpc clients
 func setupConnection(c *diMutexClient) {
 	members := getOtherMembers(c.cluster)
-	if len(members) > 0 {
-		for i := 0; i < len(members); i++ {
-			addr := members[i].Addr.String()
-			conn, err := grpc.Dial(addr, grpc.WithInsecure())
-			if err != nil {
-				log.Fatalf("Could not connect: %s", err)
-
-			}
-			c.peers[i] = d.NewDiMutexClient(conn)
+	for i := 0; i < len(members); i++ {
+		addr := members[i].Addr.String()
+		conn, err := grpc.Dial(addr, grpc.WithInsecure())
+		if err != nil {
+			log.Fatalf("Could not connect: %s", err)
 		}
+		c.peers = append(c.peers, d.NewDiMutexClient(conn))
+		//c.peers[i] = d.NewDiMutexClient(conn)
 	}
 }
 
