@@ -20,10 +20,6 @@ type diMutexClient struct {
 	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
 }
 
-const (
-	port = "???"
-)
-
 func main() {
 	//These addresses work with the dockerfile from the example
 	cluster, err := setupCluster(
@@ -139,16 +135,17 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 //"converts" serf members to grpc clients
 func setupConnection(c *diMutexClient) {
 	members := getOtherMembers(c.cluster)
-	for i := 0; i < len(members); i++ {
-		addr := members[i].Addr.String()
-		conn, err := grpc.Dial(addr, grpc.WithInsecure())
-		if err != nil {
-			log.Fatalf("Could not connect: %s", err)
+	if len(members) > 0 {
+		for i := 0; i < len(members); i++ {
+			addr := members[i].Addr.String()
+			conn, err := grpc.Dial(addr, grpc.WithInsecure())
+			if err != nil {
+				log.Fatalf("Could not connect: %s", err)
 
+			}
+			c.peers[i] = d.NewDiMutexClient(conn)
 		}
-		c.peers[i] = d.NewDiMutexClient(conn)
 	}
-
 }
 
 //nakket fra eksempel
