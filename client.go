@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -39,6 +40,7 @@ func main() {
 	c.timestamp = 0
 	c.ctx = context.Background()
 	setupConnection(&c)
+	fmt.Printf("Hello world!")
 
 }
 
