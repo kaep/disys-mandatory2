@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -55,13 +54,9 @@ func main() {
 		setupConnection(&c)
 		//ctx, _ := context.WithTimeout(ctx, time.Second*2)
 	}
-	var input string
+	request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+	c.RequestAccess(c.ctx, request)
 	for {
-		fmt.Scanln(&input)
-		if input == "get" {
-			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
-			c.RequestAccess(c.ctx, request)
-		}
 
 	}
 
