@@ -5,9 +5,10 @@ option go_package = "https://github.com/kaeppen/disys-mandatory2;DiMutex";
 
 service DiMutex {
     rpc RequestAccess (AccessRequest) returns (AccessGrant) {} //when a node wants access
-    rpc AnswerRequest (Empty) returns (RequestAnswer) {}
+    rpc AnswerRequest (AccessRequest) returns (RequestAnswer) {}
     //rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess? 
     rpc ReleaseAccess (ReleaseMessage) returns (ReleaseMessage) {} //when a node releases its access 
+    rpc HoldAndRelease (Empty) returns (Empty) {}
 }
 
 //overvej at simplificere til 1 max 2 slags beskeder 
@@ -30,8 +31,6 @@ message ReleaseMessage {
 }
 
 message RequestAnswer {
-    int32 Lamport = 1; 
-    int32 Id = 2;
 }
 
 message Empty {}
