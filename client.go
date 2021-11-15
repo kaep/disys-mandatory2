@@ -154,6 +154,7 @@ func setupConnection(c *diMutexClient) {
 	for i := 0; i < len(members); i++ {
 		addr := members[i].Addr.String()
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
+		log.Printf("adresse: %v", addr)
 		log.Printf("jeg er connection man %v", conn)
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
