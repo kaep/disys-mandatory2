@@ -74,3 +74,30 @@
 
 2021/11/15 22:45:24  requesting access to cs
 2021/11/15 22:45:24  has gotten access to cs
+2021/11/15 22:48:38 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/15 22:48:42  requesting access to cs
+2021/11/15 22:48:42  has gotten access to cs
+2021/11/15 22:49:47 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/15 22:49:51  requesting access to cs
+2021/11/15 22:49:51  has gotten access to cs
+2021/11/15 22:50:14 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/15 22:50:18  requesting access to cs
+2021/11/15 22:50:18  has gotten access to cs
+2021/11/15 22:50:40 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/15 22:50:44  requesting access to cs
+2021/11/15 22:50:44  has gotten access to cs
+2021/11/15 22:50:51  has released cs
+2021/11/15 22:50:51  requesting access to cs
+2021/11/15 22:50:51  has gotten access to cs

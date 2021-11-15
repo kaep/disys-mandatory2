@@ -53,6 +53,8 @@ func main() {
 	c.cluster = cluster
 	fmt.Printf("port: %v", cluster.LocalMember().Port)
 	waiter := time.Tick(2 * time.Second)
+	hey := getOtherMembers(cluster)
+	fmt.Print(hey)
 	select {
 	case <-waiter:
 		setupConnection(&c)
@@ -154,9 +156,11 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 func setupConnection(c *diMutexClient) {
 	fmt.Print("jeg bliver kaldt")
 	members := getOtherMembers(c.cluster)
+	fmt.Print(members)
 	for i := 0; i < len(members); i++ {
-		addr := fmt.Sprintf("client-2:%v", strconv.Itoa(int(members[i].Port)))
+		addr := fmt.Sprintf(":%v", strconv.Itoa(int(members[i].Port)))
 		fmt.Printf("adresse: %v", addr)
+		fmt.Print("jeg kommer aldrig herind")
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
 		log.Printf("adresse: %v", addr)
 		log.Printf("jeg er connection man %v", conn)
