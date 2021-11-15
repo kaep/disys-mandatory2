@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -50,6 +51,7 @@ func main() {
 	c.timestamp = 0
 	c.ctx = context.Background()
 	c.cluster = cluster
+	fmt.Printf("port: %v", cluster.LocalMember().Port)
 	waiter := time.Tick(2 * time.Second)
 	select {
 	case <-waiter:
@@ -152,7 +154,7 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 func setupConnection(c *diMutexClient) {
 	members := getOtherMembers(c.cluster)
 	for i := 0; i < len(members); i++ {
-		addr := strconv.Itoa(int(members[i].Port))
+		addr := fmt.Sprintf(":%v", strconv.Itoa(int(members[i].Port)))
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
 		log.Printf("adresse: %v", addr)
 		log.Printf("jeg er connection man %v", conn)

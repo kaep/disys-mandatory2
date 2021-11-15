@@ -10,6 +10,8 @@ services:
             - ADVERTISE_ADDR=172.17.0.2
             - NAME="Henning"
             - ID = "1"
+        ports: 
+            - "8080:8080"    
     client-2: 
         container_name: "dimutex_2"
         image: dimutex:latest
@@ -20,6 +22,8 @@ services:
             - CLUSTER_ADDR=172.17.0.2
             - NAME="Mikki"
             - ID = "2"
+        ports: 
+            - "8081:8080"    
     client-3: 
         container_name: "dimutex_3"
         image: dimutex:latest
@@ -29,7 +33,9 @@ services:
             - ADVERTISE_ADDR=172.17.0.4
             - CLUSTER_ADDR=172.17.0.2
             - NAME="Jens"
-            - ID = "3"        
+            - ID = "3"   
+        ports: 
+            - "8082:8080"     
     client-4: 
         container_name: "dimutex_4"
         image: dimutex:latest
@@ -40,3 +46,5 @@ services:
             - CLUSTER_ADDR=172.17.0.2
             - NAME="Børge"        
             - ID = "4"
+        ports: 
+            - "8083:8080"    
