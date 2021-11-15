@@ -152,7 +152,7 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 func setupConnection(c *diMutexClient) {
 	members := getOtherMembers(c.cluster)
 	for i := 0; i < len(members); i++ {
-		addr := members[i].Addr.String()
+		addr := strconv.Itoa(int(members[i].Port))
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
 		log.Printf("adresse: %v", addr)
 		log.Printf("jeg er connection man %v", conn)
