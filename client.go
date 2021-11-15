@@ -152,9 +152,11 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 
 //"converts" serf members to grpc clients
 func setupConnection(c *diMutexClient) {
+	fmt.Print("jeg bliver kaldt")
 	members := getOtherMembers(c.cluster)
 	for i := 0; i < len(members); i++ {
 		addr := fmt.Sprintf("client-2:%v", strconv.Itoa(int(members[i].Port)))
+		fmt.Printf("adresse: %v", addr)
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
 		log.Printf("adresse: %v", addr)
 		log.Printf("jeg er connection man %v", conn)
