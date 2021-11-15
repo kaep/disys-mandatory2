@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -155,7 +154,7 @@ func setupConnection(c *diMutexClient) {
 	for i := 0; i < len(members); i++ {
 		addr := members[i].Addr.String()
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
-		fmt.Printf("jeg er connection man %v", conn)
+		log.Printf("jeg er connection man %v", conn)
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
 		}
