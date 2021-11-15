@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -135,6 +136,7 @@ func hasPrecedence(own int, recieved int) bool {
 }
 
 func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequest) (*d.RequestAnswer, error) {
+	fmt.Print("Jeg er lige blevet ringet op med et gRPC kald, av av")
 	c.timestamp++ //increment before doing anything
 	//if this node already has access or wants it and also has "more right"
 	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, int(request.Lamport))) {
