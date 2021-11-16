@@ -23,6 +23,7 @@ type DiMutexClient interface {
 	//rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess?
 	ReleaseAccess(ctx context.Context, in *ReleaseMessage, opts ...grpc.CallOption) (*ReleaseMessage, error)
 	HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	Hello(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type diMutexClient struct {
@@ -69,6 +70,15 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, in *Empty, opts ...g
 	return out, nil
 }
 
+func (c *diMutexClient) Hello(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/Hello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DiMutexServer is the server API for DiMutex service.
 // All implementations must embed UnimplementedDiMutexServer
 // for forward compatibility
@@ -78,6 +88,7 @@ type DiMutexServer interface {
 	//rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess?
 	ReleaseAccess(context.Context, *ReleaseMessage) (*ReleaseMessage, error)
 	HoldAndRelease(context.Context, *Empty) (*Empty, error)
+	Hello(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedDiMutexServer()
 }
 
@@ -96,6 +107,9 @@ func (UnimplementedDiMutexServer) ReleaseAccess(context.Context, *ReleaseMessage
 }
 func (UnimplementedDiMutexServer) HoldAndRelease(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HoldAndRelease not implemented")
+}
+func (UnimplementedDiMutexServer) Hello(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
 }
 func (UnimplementedDiMutexServer) mustEmbedUnimplementedDiMutexServer() {}
 
@@ -182,6 +196,24 @@ func _DiMutex_HoldAndRelease_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DiMutex_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DiMutexServer).Hello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dimutex.DiMutex/Hello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DiMutexServer).Hello(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DiMutex_ServiceDesc is the grpc.ServiceDesc for DiMutex service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -205,7 +237,11 @@ var DiMutex_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "HoldAndRelease",
 			Handler:    _DiMutex_HoldAndRelease_Handler,
 		},
+		{
+			MethodName: "Hello",
+			Handler:    _DiMutex_Hello_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "dimutex.proto",
+	Metadata: "DiMutex.proto",
 }

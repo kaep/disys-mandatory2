@@ -69,14 +69,18 @@ func main() {
 	case <-waiter:
 		setupConnection(&c)
 	}
+	c.peers[0].Hello(c.ctx, &d.Empty{})
+	//for {
+	//	select {
+	//	case <-waiter:
+	//		request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
+	//		c.RequestAccess(c.ctx, request)
+	//	}
+	//}
+}
 
-	for {
-		select {
-		case <-waiter:
-			request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
-			c.RequestAccess(c.ctx, request)
-		}
-	}
+func (c *diMutexClient) Hello(in *d.Empty) {
+	fmt.Print("HEJSA :)))")
 }
 
 func setupCluster(advertiseAddr string, clusterAddr string) (*serf.Serf, error) {

@@ -9,6 +9,7 @@ service DiMutex {
     //rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess? 
     rpc ReleaseAccess (ReleaseMessage) returns (ReleaseMessage) {} //when a node releases its access 
     rpc HoldAndRelease (Empty) returns (Empty) {}
+    rpc Hello (Empty) returns (Empty) {}
 }
 
 //overvej at simplificere til 1 max 2 slags beskeder 
