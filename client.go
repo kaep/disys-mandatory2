@@ -69,7 +69,13 @@ func main() {
 	case <-waiter:
 		setupConnection(&c)
 	}
-	c.peers[0].Hello(c.ctx, &d.Empty{})
+	conn, err := grpc.Dial(":8081", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("Could not connect: %s", err)
+	}
+	clientmand := d.NewDiMutexClient(conn)
+	clientmand.Hello(c.ctx, &d.Empty{})
+
 	//for {
 	//	select {
 	//	case <-waiter:
