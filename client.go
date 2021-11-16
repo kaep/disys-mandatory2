@@ -76,7 +76,7 @@ func serve(c *diMutexClient, listener net.Listener) {
 	}
 }
 
-func (c *diMutexClient) Hello(in *d.Empty) {
+func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) {
 	log.Print("HEJSA :)))")
 }
 
