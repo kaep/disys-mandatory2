@@ -80,7 +80,7 @@ func main() {
 }
 
 func (c *diMutexClient) Hello(in *d.Empty) {
-	fmt.Print("HEJSA :)))")
+	log.Print("HEJSA :)))")
 }
 
 func setupCluster(advertiseAddr string, clusterAddr string) (*serf.Serf, error) {
