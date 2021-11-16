@@ -115,7 +115,7 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Em
 
 	//tell my peers that i want the critical section
 	peers := c.peers
-	for i := 0; i < len(peers); i++ {
+	for i := range c.peers {
 		_, err := peers[i].AnswerRequest(ctx, in)
 		if err != nil {
 			log.Fatalf("Error while getting replies %v", err)
