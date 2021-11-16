@@ -14,10 +14,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Server struct {
-	d.UnimplementedDiMutexServer
-}
-
 type diMutexClient struct {
 	d.UnimplementedDiMutexServer
 	state     State
@@ -49,7 +45,7 @@ func main() {
 
 	//register the node as a server
 	server := grpc.NewServer()
-	d.RegisterDiMutexServer(server, &Server{})
+	d.RegisterDiMutexServer(server, &c)
 
 	port := c.id + 8080
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
@@ -89,10 +85,10 @@ func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
 	}
 }
 
-func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) *d.Empty {
+func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) (*d.Empty, error) {
 	log.Print("HEJSA :)))")
 
-	return &d.Empty{}
+	return &d.Empty{}, nil
 }
 
 //local actions -> OVERVEJ NAVNE
@@ -104,7 +100,7 @@ func GetAccess(message string, c *diMutexClient) {
 }
 
 //The "multicast" part of the algorithm
-func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, opts ...grpc.CallOption) (*d.AccessGrant, error) {
+func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest) (*d.AccessGrant, error) {
 	log.Printf("%v requesting access to cs", c.name)
 	//bump own clock before sending out the message
 	c.timestamp++
@@ -128,7 +124,7 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.AccessRequest, 
 	return nil, nil
 }
 
-func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.Empty {
+func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.Empty, error) {
 	log.Printf("%v has gotten access to cs", c.name)
 	c.state = Held
 	//Hold the critical section for 7 seconds
@@ -139,7 +135,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.E
 
 	//maybe broadcast
 
-	return empty
+	return empty, nil
 }
 
 func hasPrecedence(ownTime int, ownId int, otherTime int, otherId int) bool {
