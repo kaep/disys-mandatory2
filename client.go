@@ -64,8 +64,10 @@ func main() {
 	d.RegisterDiMutexServer(server, &Server{})
 	c.server = server
 
-	//listen (attempt to use serf agent port -> might be wrong)
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port)))))
+	//listen (attempt to use serf agent port -> might be wrong)¨
+	fmt.Printf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port))))
+	listen, err := net.Listen("tcp", ":8080")
+	log.Printf("Sserver listening on %v", listen.Addr())
 	if err := server.Serve(listen); err != nil {
 		log.Printf("Node %v failed to serve: %v", c.name, err)
 	}
