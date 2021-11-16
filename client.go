@@ -89,8 +89,10 @@ func serve(c *diMutexClient, listener net.Listener) {
 	}
 }
 
-func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) {
+func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) *d.Empty {
 	log.Print("HEJSA :)))")
+
+	return &d.Empty{}
 }
 
 //local actions -> OVERVEJ NAVNE
