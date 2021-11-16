@@ -18,11 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DiMutexClient interface {
-	RequestAccess(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessGrant, error)
-	AnswerRequest(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*RequestAnswer, error)
-	//rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess?
-	ReleaseAccess(ctx context.Context, in *ReleaseMessage, opts ...grpc.CallOption) (*ReleaseMessage, error)
-	HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error)
+	AnswerRequest(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
+	HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Reply, error)
+	Grant(ctx context.Context, in *Reply, opts ...grpc.CallOption) (*Empty, error)
 	Hello(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -34,8 +33,8 @@ func NewDiMutexClient(cc grpc.ClientConnInterface) DiMutexClient {
 	return &diMutexClient{cc}
 }
 
-func (c *diMutexClient) RequestAccess(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessGrant, error) {
-	out := new(AccessGrant)
+func (c *diMutexClient) RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/RequestAccess", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -43,8 +42,8 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *AccessRequest, op
 	return out, nil
 }
 
-func (c *diMutexClient) AnswerRequest(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*RequestAnswer, error) {
-	out := new(RequestAnswer)
+func (c *diMutexClient) AnswerRequest(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error) {
+	out := new(Reply)
 	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/AnswerRequest", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -52,18 +51,18 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, in *AccessRequest, op
 	return out, nil
 }
 
-func (c *diMutexClient) ReleaseAccess(ctx context.Context, in *ReleaseMessage, opts ...grpc.CallOption) (*ReleaseMessage, error) {
-	out := new(ReleaseMessage)
-	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/ReleaseAccess", in, out, opts...)
+func (c *diMutexClient) HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Reply, error) {
+	out := new(Reply)
+	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/HoldAndRelease", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *diMutexClient) HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+func (c *diMutexClient) Grant(ctx context.Context, in *Reply, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/HoldAndRelease", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/Grant", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +82,10 @@ func (c *diMutexClient) Hello(ctx context.Context, in *Empty, opts ...grpc.CallO
 // All implementations must embed UnimplementedDiMutexServer
 // for forward compatibility
 type DiMutexServer interface {
-	RequestAccess(context.Context, *AccessRequest) (*AccessGrant, error)
-	AnswerRequest(context.Context, *AccessRequest) (*RequestAnswer, error)
-	//rpc GrantAccess () returns () {} //when a node has been decided to get access -> måske ikke nødvendigt hvis logikken der finder "vinderen" laves i RequestAccess?
-	ReleaseAccess(context.Context, *ReleaseMessage) (*ReleaseMessage, error)
-	HoldAndRelease(context.Context, *Empty) (*Empty, error)
+	RequestAccess(context.Context, *Request) (*Empty, error)
+	AnswerRequest(context.Context, *Request) (*Reply, error)
+	HoldAndRelease(context.Context, *Empty) (*Reply, error)
+	Grant(context.Context, *Reply) (*Empty, error)
 	Hello(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedDiMutexServer()
 }
@@ -96,17 +94,17 @@ type DiMutexServer interface {
 type UnimplementedDiMutexServer struct {
 }
 
-func (UnimplementedDiMutexServer) RequestAccess(context.Context, *AccessRequest) (*AccessGrant, error) {
+func (UnimplementedDiMutexServer) RequestAccess(context.Context, *Request) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAccess not implemented")
 }
-func (UnimplementedDiMutexServer) AnswerRequest(context.Context, *AccessRequest) (*RequestAnswer, error) {
+func (UnimplementedDiMutexServer) AnswerRequest(context.Context, *Request) (*Reply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AnswerRequest not implemented")
 }
-func (UnimplementedDiMutexServer) ReleaseAccess(context.Context, *ReleaseMessage) (*ReleaseMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReleaseAccess not implemented")
-}
-func (UnimplementedDiMutexServer) HoldAndRelease(context.Context, *Empty) (*Empty, error) {
+func (UnimplementedDiMutexServer) HoldAndRelease(context.Context, *Empty) (*Reply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HoldAndRelease not implemented")
+}
+func (UnimplementedDiMutexServer) Grant(context.Context, *Reply) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Grant not implemented")
 }
 func (UnimplementedDiMutexServer) Hello(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
@@ -125,7 +123,7 @@ func RegisterDiMutexServer(s grpc.ServiceRegistrar, srv DiMutexServer) {
 }
 
 func _DiMutex_RequestAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AccessRequest)
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -137,13 +135,13 @@ func _DiMutex_RequestAccess_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/dimutex.DiMutex/RequestAccess",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DiMutexServer).RequestAccess(ctx, req.(*AccessRequest))
+		return srv.(DiMutexServer).RequestAccess(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _DiMutex_AnswerRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AccessRequest)
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -155,25 +153,7 @@ func _DiMutex_AnswerRequest_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/dimutex.DiMutex/AnswerRequest",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DiMutexServer).AnswerRequest(ctx, req.(*AccessRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DiMutex_ReleaseAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReleaseMessage)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DiMutexServer).ReleaseAccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/dimutex.DiMutex/ReleaseAccess",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DiMutexServer).ReleaseAccess(ctx, req.(*ReleaseMessage))
+		return srv.(DiMutexServer).AnswerRequest(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,6 +172,24 @@ func _DiMutex_HoldAndRelease_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DiMutexServer).HoldAndRelease(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DiMutex_Grant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Reply)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DiMutexServer).Grant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dimutex.DiMutex/Grant",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DiMutexServer).Grant(ctx, req.(*Reply))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,12 +228,12 @@ var DiMutex_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DiMutex_AnswerRequest_Handler,
 		},
 		{
-			MethodName: "ReleaseAccess",
-			Handler:    _DiMutex_ReleaseAccess_Handler,
-		},
-		{
 			MethodName: "HoldAndRelease",
 			Handler:    _DiMutex_HoldAndRelease_Handler,
+		},
+		{
+			MethodName: "Grant",
+			Handler:    _DiMutex_Grant_Handler,
 		},
 		{
 			MethodName: "Hello",
