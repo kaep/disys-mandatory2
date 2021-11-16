@@ -62,7 +62,7 @@ func main() {
 	if c.id != 0 {
 		conn, err := grpc.Dial("dimutex_1:8080", grpc.WithInsecure(), grpc.WithBlock())
 		log.Print("sup kings")
-		log.Printf("connection %v", conn)
+		log.Printf("connection %v", conn.GetState())
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
 		}
