@@ -133,15 +133,26 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.E
 	return nil //wrong?
 }
 
-func hasPrecedence(own int, recieved int) bool {
-	return own > recieved
+func hasPrecedence(ownTime int, ownId int, otherTime int, otherId int) bool {
+	if ownTime > otherTime {
+		return true
+	} else if otherTime > ownTime {
+		return false
+	} else {
+		//if timestamps are equal, tiebreaker is node id
+		if ownId > otherId {
+			return true
+		} else {
+			return false
+		}
+	}
 }
 
 func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequest) (*d.RequestAnswer, error) {
 	log.Print("Jeg er lige blevet ringet op med et gRPC kald, av av")
 	c.timestamp++ //increment before doing anything
 	//if this node already has access or wants it and also has "more right"
-	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, int(request.Lamport))) {
+	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, c.id, int(request.Lamport), int(request.Id))) {
 		//queue the request from other node
 		return nil, nil //return value?
 	} else {
