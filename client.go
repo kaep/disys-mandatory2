@@ -65,8 +65,8 @@ func main() {
 	c.server = server
 
 	//listen (attempt to use serf agent port -> might be wrong)¨
-	fmt.Printf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port))))
-	listen, err := net.Listen("tcp", ":8080")
+	//fmt.Printf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port))))
+	listen, err := net.Listen("tcp", os.Getenv("PORT"))
 	log.Printf("Sserver listening on %v", listen.Addr())
 	if err := server.Serve(listen); err != nil {
 		log.Printf("Node %v failed to serve: %v", c.name, err)

@@ -122,3 +122,12 @@
 
 
 2021/11/16 10:43:48 Sserver listening on [::]:8080
+2021/11/16 10:48:13 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/16 10:52:43 Couldn't join cluster, starting own: 1 error occurred:
+	* Failed to resolve : lookup : no such host
+
+
+2021/11/16 10:52:43 Sserver listening on [::]:56544
