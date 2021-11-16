@@ -21,7 +21,6 @@ type Server struct {
 }
 
 type diMutexClient struct {
-	cluster   *serf.Serf
 	state     State
 	timestamp int
 	ctx       context.Context
@@ -41,25 +40,12 @@ func main() {
 	defer f.Close()
 	wrt := io.MultiWriter(os.Stdout, f)
 	log.SetOutput(wrt)
-
-	//These addresses work with the dockerfile from the example
-	cluster, err := setupCluster(
-		os.Getenv("ADVERTISE_ADDR"),
-		os.Getenv("CLUSTER_ADDR"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cluster.Leave()
 	c := diMutexClient{}
 	c.name = os.Getenv("NAME")
 	c.id, _ = strconv.Atoi(os.Getenv("ID"))
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
-	c.cluster = cluster
-	mappy := make(map[string]string)
-	mappy["port"] = os.Getenv("PORT")
-	c.cluster.SetTags(mappy)
 	waiter := time.Tick(2 * time.Second)
 
 	//register the node as a server
@@ -69,7 +55,11 @@ func main() {
 
 	//listen (attempt to use serf agent port -> might be wrong)¨
 	//fmt.Printf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port))))
-	listen, err := net.Listen("tcp", os.Getenv("PORT"))
+	port := c.id + 8080
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
+	if err != nil {
+		log.Printf("Failed to listen on port %v", listen.Addr())
+	}
 	log.Printf("Sserver listening on %v", listen.Addr())
 	if err := server.Serve(listen); err != nil {
 		log.Printf("Node %v failed to serve: %v", c.name, err)
@@ -182,34 +172,15 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 	}
 }
 
-//"converts" serf members to grpc clients
+//Set up connection to peers
 func setupConnection(c *diMutexClient) {
-	fmt.Print("setupConnection er kaldt")
-	members := getOtherMembers(c.cluster)
-	for i := 0; i < len(members); i++ {
-		port := members[i].Tags["port"]
-		fmt.Printf("Adresse: %v", port)
-		conn, err := grpc.Dial(port, grpc.WithInsecure())
+	//harcode connection to peers
+	for i := 0; i < 4; i++ {
+		port := fmt.Sprintf(":&v", c.id+8080)
+		conn, err := grpc.Dial(port, grpc.WithInsecure(), grpc.WithBlock())
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
 		}
 		c.peers = append(c.peers, d.NewDiMutexClient(conn))
 	}
-}
-
-//nakket fra eksempel
-func getOtherMembers(cluster *serf.Serf) []serf.Member {
-	members := cluster.Members()
-	for i := 0; i < len(members); {
-		if members[i].Name == cluster.LocalMember().Name || members[i].Status != serf.StatusAlive {
-			if i < len(members)-1 {
-				members = append(members[:i], members[i+1:]...)
-			} else {
-				members = members[:i]
-			}
-		} else {
-			i++
-		}
-	}
-	return members
 }
