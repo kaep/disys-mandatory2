@@ -136,7 +136,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.
 }
 
 func (c *diMutexClient) ReplyToQueue() {
-	for i := 0; i < len(c.queue); i++ {
+	for i := range c.queue {
 		//reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, c.queue[i]), Lamport: c.timestamp, Id: c.id}
 		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, c.queue[i])
 		c.peers[int(c.queue[i])].Grant(c.ctx, &d.Empty{})
