@@ -5,9 +5,9 @@ option go_package = "https://github.com/kaeppen/disys-mandatory2;dimutex";
 
 service DiMutex {
     rpc RequestAccess (Request) returns (Empty) {} //when a node wants access
-    rpc AnswerRequest (Request) returns (Reply) {} //when a node replies to a request
+    rpc AnswerRequest (Request) returns (Empty) {} //when a node replies to a request
     rpc HoldAndRelease (Empty) returns (Reply) {} //hold the CS and release int32
-    rpc Grant (Reply) returns (Empty) {}
+    rpc Grant (Empty) returns (Empty) {}
     rpc Hello (Empty) returns (Empty) {}
 }
 

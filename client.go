@@ -59,7 +59,25 @@ func main() {
 
 	//set up connection to peers
 	setupConnection(&c)
+	c.participate()
+}
 
+func (c *diMutexClient) participate() {
+	for {
+		request := d.Request{Message: fmt.Sprintf("%v (node %v) want's the critical section!", c.name, c.id), Lamport: c.timestamp, Id: c.id}
+		c.RequestAccess(c.ctx, &request)
+
+		//as long as we don't have enough replies
+		for int(c.replies) < len(c.peers) {
+			//waiting..
+		}
+		//we've got N-1 replies and can now access the CS
+		c.HoldAndRelease(c.ctx, &d.Empty{})
+
+		//now i'll reply to my queue
+		c.ReplyToQueue()
+
+	}
 }
 
 func demo() {
@@ -98,18 +116,11 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Em
 	//tell my peers that i want the critical section
 	peers := c.peers
 	for i := 0; i < len(peers); i++ {
-		answer, err := peers[i].AnswerRequest(ctx, in)
-		if answer != nil && err != nil {
-			c.replies++
+		_, err := peers[i].AnswerRequest(ctx, in)
+		if err != nil {
+			log.Fatalf("Error while getting replies %v", err)
 		}
 	}
-	//if i receive N-1 replies, then i can have the critical section
-	if int(c.replies) == len(peers) {
-		c.HoldAndRelease(ctx, &d.Empty{})
-	} else {
-		//wait for replies.. might be possible with streaming?
-	}
-
 	return &d.Empty{}, nil
 }
 
@@ -121,22 +132,23 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.
 	//Release it
 	c.state = Released
 	log.Printf("%v (node %v) has released cs", c.name, c.id)
-
-	//reply to my queue
-	c.ReplyToQueue()
-
 	return &d.Reply{}, nil
 }
 
 func (c *diMutexClient) ReplyToQueue() {
 	for i := 0; i < len(c.queue); i++ {
-		reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, c.queue[i]), Lamport: c.timestamp, Id: c.id}
-		c.peers[int(c.queue[i])].Grant(c.ctx, &reply)
+		//reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, c.queue[i]), Lamport: c.timestamp, Id: c.id}
+		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, c.queue[i])
+		c.peers[int(c.queue[i])].Grant(c.ctx, &d.Empty{})
 	}
 }
 
-func (c *diMutexClient) Grant(ctx context.Context, reply *d.Reply) (*d.Empty, error) {
+func (c *diMutexClient) GrantAccess(ctx context.Context, id int32) {
+	c.peers[int(id)].Grant(ctx, &d.Empty{})
+}
 
+func (c *diMutexClient) Grant(ctx context.Context, reply *d.Empty) (*d.Empty, error) {
+	c.replies++
 	return &d.Empty{}, nil
 }
 
@@ -155,19 +167,20 @@ func hasPrecedence(ownTime int32, ownId int32, otherTime int32, otherId int32) b
 	}
 }
 
-func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.Request) (*d.Reply, error) {
+func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.Request) (*d.Empty, error) {
 	log.Print("Jeg er lige blevet ringet op med et gRPC kald, av av")
 	c.timestamp++ //increment before doing anything
 	//if this node already has access or wants it and also has "more right"
 	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, c.id, request.Lamport, request.Id)) {
 		//queue the request from other node
 		c.queue = append(c.queue, request.Id)
-		return nil, nil
 	} else {
-		//else, just send a reply
-		reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, request.Id), Lamport: c.timestamp, Id: c.id}
-		return &reply, nil
+		//else, just grant access
+		//reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, request.Id), Lamport: c.timestamp, Id: c.id}
+		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, request.Id)
+		c.GrantAccess(ctx, request.Id)
 	}
+	return &d.Empty{}, nil
 }
 
 //Set up connection to peers
