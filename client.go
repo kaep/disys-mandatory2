@@ -144,7 +144,10 @@ func (c *diMutexClient) ReplyToQueue() {
 }
 
 func (c *diMutexClient) GrantAccess(ctx context.Context, id int32) {
-	c.peers[int(id)].Grant(ctx, &d.Empty{})
+	_, err := c.peers[int(id)].Grant(ctx, &d.Empty{})
+	if err != nil {
+		log.Fatalf("Error while granting access to node %v: %v", id, err)
+	}
 }
 
 func (c *diMutexClient) Grant(ctx context.Context, reply *d.Empty) (*d.Empty, error) {
