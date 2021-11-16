@@ -64,9 +64,15 @@ func main() {
 
 func (c *diMutexClient) participate() {
 	for {
-		//let one node have the advantage to avoid deadlock
-		if c.name != "Mikki" {
+		//to avoid all nodes going str8 for the gold and deadlocking
+		if c.id == 4 {
 			time.Sleep(2 * time.Second)
+		}
+		if c.id == 2 {
+			time.Sleep(8 * time.Second)
+		}
+		if c.id == 3 {
+			time.Sleep(5 * time.Second)
 		}
 		request := d.Request{Message: fmt.Sprintf("%v (node %v) want's the critical section!", c.name, c.id), Lamport: c.timestamp, Id: c.id}
 		c.RequestAccess(c.ctx, &request)
@@ -82,10 +88,6 @@ func (c *diMutexClient) participate() {
 		c.ReplyToQueue()
 
 	}
-}
-
-func demo() {
-	//create some demo behavior here (for the logs)
 }
 
 func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
