@@ -205,7 +205,6 @@ func setupConnection(c *diMutexClient) {
 				log.Fatalf("Could not connect: %s", err)
 			}
 			c.peers[i] = d.NewDiMutexClient(conn)
-			log.Printf("node %v added node %v to list of peers", c.id, i)
 		}
 	}
 }
