@@ -145,8 +145,8 @@ func (c *diMutexClient) ReplyToQueue() {
 		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, c.queue[i])
 		c.peers[int(c.queue[i])].Grant(c.ctx, &d.Empty{})
 		//reset queue size
-		c.queue = make([]int32, 0)
 	}
+	c.queue = make([]int32, 0)
 }
 
 func (c *diMutexClient) GrantAccess(ctx context.Context, id int32) {
