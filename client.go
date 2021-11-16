@@ -73,7 +73,6 @@ func setupCluster(advertiseAddr string, clusterAddr string) (*serf.Serf, error) 
 	conf := serf.DefaultConfig()
 	conf.Init()
 	conf.MemberlistConfig.AdvertiseAddr = advertiseAddr
-
 	cluster, err := serf.Create(conf)
 	if err != nil {
 		return nil, errors.Wrap(err, "Couldn't create cluster")
@@ -154,16 +153,13 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 
 //"converts" serf members to grpc clients
 func setupConnection(c *diMutexClient) {
-	fmt.Print("jeg bliver kaldt")
+	fmt.Print("setupConnection er kaldt")
 	members := getOtherMembers(c.cluster)
 	fmt.Print(members)
 	for i := 0; i < len(members); i++ {
 		addr := fmt.Sprintf(":%v", strconv.Itoa(int(members[i].Port)))
-		fmt.Printf("adresse: %v", addr)
-		fmt.Print("jeg kommer aldrig herind")
+		fmt.Printf("Adresse: %v", addr)
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
-		log.Printf("adresse: %v", addr)
-		log.Printf("jeg er connection man %v", conn)
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
 		}
