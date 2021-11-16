@@ -64,6 +64,10 @@ func main() {
 
 func (c *diMutexClient) participate() {
 	for {
+		//let one node have the advantage to avoid deadlock
+		if c.name != "Mikki" {
+			time.Sleep(1 * time.Second)
+		}
 		request := d.Request{Message: fmt.Sprintf("%v (node %v) want's the critical section!", c.name, c.id), Lamport: c.timestamp, Id: c.id}
 		c.RequestAccess(c.ctx, &request)
 
