@@ -57,6 +57,9 @@ func main() {
 	c.timestamp = 0
 	c.ctx = context.Background()
 	c.cluster = cluster
+	mappy := make(map[string]string)
+	mappy["port"] = os.Getenv("PORT")
+	c.cluster.SetTags(mappy)
 	waiter := time.Tick(2 * time.Second)
 
 	//register the node as a server
@@ -183,11 +186,10 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.AccessRequ
 func setupConnection(c *diMutexClient) {
 	fmt.Print("setupConnection er kaldt")
 	members := getOtherMembers(c.cluster)
-	fmt.Print(members)
 	for i := 0; i < len(members); i++ {
-		addr := fmt.Sprintf(":%v", strconv.Itoa(int(members[i].Port)))
-		fmt.Printf("Adresse: %v", addr)
-		conn, err := grpc.Dial(addr, grpc.WithInsecure())
+		port := members[i].Tags["port"]
+		fmt.Printf("Adresse: %v", port)
+		conn, err := grpc.Dial(port, grpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
 		}
