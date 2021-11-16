@@ -130,7 +130,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) *d.E
 
 	//maybe broadcast
 
-	return nil //wrong?
+	return empty
 }
 
 func hasPrecedence(ownTime int, ownId int, otherTime int, otherId int) bool {
@@ -175,7 +175,6 @@ func setupConnection(c *diMutexClient) {
 			log.Fatalf("Could not connect: %s", err)
 		}
 		c.peers = append(c.peers, d.NewDiMutexClient(conn))
-		//c.peers[i] = d.NewDiMutexClient(conn)
 	}
 }
 
