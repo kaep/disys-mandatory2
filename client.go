@@ -68,7 +68,10 @@ func main() {
 		}
 		clientmand := d.NewDiMutexClient(conn)
 		for {
-			clientmand.Hello(c.ctx, &d.Empty{})
+			_, err := clientmand.Hello(c.ctx, &d.Empty{})
+			if err != nil {
+				log.Fatalf("Der skete en fejl! %v", err)
+			}
 			//clientmand.AnswerRequest(nil, nil)
 		}
 	} else {
