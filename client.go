@@ -52,7 +52,7 @@ func main() {
 	go setupServer(&c)
 
 	//testkode som sender en grpc request
-	conn, err := grpc.Dial("client-1:8081", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("client-1:8080", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Could not connect: %s", err)
 	}

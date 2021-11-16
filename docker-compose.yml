@@ -8,7 +8,7 @@ services:
             dockerfile: ./Dockerfile
         environment: 
             - NAME="Henning"
-            - ID=1
+            - ID=0
             - PORT="8080"  
     client-2: 
         container_name: "dimutex_2"
@@ -17,7 +17,7 @@ services:
             dockerfile: ./Dockerfile
         environment: 
             - NAME="Mikki"
-            - ID=2
+            - ID=1
             - PORT="8081"   
     client-3: 
         container_name: "dimutex_3"
@@ -26,7 +26,7 @@ services:
             dockerfile: ./Dockerfile
         environment: 
             - NAME="Jens"
-            - ID=3  
+            - ID=2  
             - PORT="8082"    
     client-4: 
         container_name: "dimutex_4"
@@ -35,5 +35,5 @@ services:
             dockerfile: ./Dockerfile
         environment: 
             - NAME="Børge"        
-            - ID=4
+            - ID=3
             - PORT="8083"  
