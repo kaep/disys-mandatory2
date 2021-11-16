@@ -101,8 +101,8 @@ func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) (*d.Empty, error
 func GetAccess(message string, c *diMutexClient) {
 	c.timestamp++    //bump logical clock
 	c.state = Wanted //set the state to wanted
-	request := &d.Request{Message: "I want access!", Lamport: int32(c.timestamp), Id: c.id}
-	c.RequestAccess(c.ctx, request)
+	request := d.Request{Message: "I want access!", Lamport: int32(c.timestamp), Id: c.id}
+	c.RequestAccess(c.ctx, &request)
 }
 
 //The "multicast" part of the algorithm
@@ -168,7 +168,6 @@ func hasPrecedence(ownTime int32, ownId int32, otherTime int32, otherId int32) b
 }
 
 func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.Request) (*d.Empty, error) {
-	log.Print("Jeg er lige blevet ringet op med et gRPC kald, av av")
 	c.timestamp++ //increment before doing anything
 	//if this node already has access or wants it and also has "more right"
 	if c.state == Held || (c.state == Wanted && hasPrecedence(c.timestamp, c.id, request.Lamport, request.Id)) {
