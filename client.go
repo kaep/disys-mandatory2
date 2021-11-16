@@ -19,13 +19,13 @@ type Server struct {
 }
 
 type diMutexClient struct {
+	d.UnimplementedDiMutexServer
 	state     State
 	timestamp int
 	ctx       context.Context
 	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
 	name      string
 	id        int
-	server    *grpc.Server
 }
 
 func main() {
@@ -48,15 +48,15 @@ func main() {
 	defer cancel()
 
 	//register the node as a server
-	c.server = grpc.NewServer()
-	d.RegisterDiMutexServer(c.server, &Server{})
+	server := grpc.NewServer()
+	d.RegisterDiMutexServer(server, &Server{})
 
 	port := c.id + 8080
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
 	if err != nil {
 		log.Printf("Failed to listen on port %v", listen.Addr())
 	}
-	go serve(&c, listen)
+	go serve(server, listen, &c)
 
 	//testkode som sender en grpc request
 	if c.id != 0 {
@@ -82,9 +82,9 @@ func main() {
 
 }
 
-func serve(c *diMutexClient, listener net.Listener) {
+func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
 	log.Printf("Server listening on %v", listener.Addr())
-	if err := c.server.Serve(listener); err != nil {
+	if err := server.Serve(listener); err != nil {
 		log.Printf("Node %v failed to serve: %v", c.name, err)
 	}
 }
