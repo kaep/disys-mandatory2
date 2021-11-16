@@ -10,9 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/serf/serf"
 	d "github.com/kaeppen/disys-mandatory2/dimutex"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
 
@@ -46,64 +44,40 @@ func main() {
 	c.state = Released
 	c.timestamp = 0
 	c.ctx = context.Background()
-	waiter := time.Tick(2 * time.Second)
 
 	//register the node as a server
 	server := grpc.NewServer()
 	d.RegisterDiMutexServer(server, &Server{})
 	c.server = server
+	go setupServer(&c)
 
-	//listen (attempt to use serf agent port -> might be wrong)¨
-	//fmt.Printf(":%v", strconv.Itoa((int(c.cluster.LocalMember().Port))))
-	port := c.id + 8080
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
-	if err != nil {
-		log.Printf("Failed to listen on port %v", listen.Addr())
-	}
-	log.Printf("Sserver listening on %v", listen.Addr())
-	if err := server.Serve(listen); err != nil {
-		log.Printf("Node %v failed to serve: %v", c.name, err)
-	}
-
-	select {
-	case <-waiter:
-		setupConnection(&c)
-	}
+	//testkode som sender en grpc request
 	conn, err := grpc.Dial(":8081", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Could not connect: %s", err)
 	}
 	clientmand := d.NewDiMutexClient(conn)
-	clientmand.Hello(c.ctx, &d.Empty{})
+	for {
+		clientmand.Hello(c.ctx, &d.Empty{})
+	}
 
-	//for {
-	//	select {
-	//	case <-waiter:
-	//		request := &d.AccessRequest{Message: "Hey", Lamport: int32(c.timestamp), Id: 9000} //bogus id
-	//		c.RequestAccess(c.ctx, request)
-	//	}
-	//}
+}
+
+func setupServer(node *diMutexClient) {
+	port := node.id + 8080
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
+	if err != nil {
+		log.Printf("Failed to listen on port %v", listen.Addr())
+	}
+	log.Printf("Sserver listening on %v", listen.Addr())
+	if err := node.server.Serve(listen); err != nil {
+		log.Printf("Node %v failed to serve: %v", node.name, err)
+	}
+
 }
 
 func (c *diMutexClient) Hello(in *d.Empty) {
 	log.Print("HEJSA :)))")
-}
-
-func setupCluster(advertiseAddr string, clusterAddr string) (*serf.Serf, error) {
-	conf := serf.DefaultConfig()
-	conf.Init()
-	conf.MemberlistConfig.AdvertiseAddr = advertiseAddr
-	cluster, err := serf.Create(conf)
-	if err != nil {
-		return nil, errors.Wrap(err, "Couldn't create cluster")
-	}
-
-	_, err = cluster.Join([]string{clusterAddr}, true)
-	if err != nil {
-		log.Printf("Couldn't join cluster, starting own: %v\n", err)
-	}
-
-	return cluster, nil
 }
 
 //local actions -> OVERVEJ NAVNE
