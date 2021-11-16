@@ -185,6 +185,7 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.Request) (
 
 //Set up connection to peers
 func setupConnection(c *diMutexClient) {
+	c.peers = make(map[int]d.DiMutexClient)
 	for i := 0; i < 4; i++ {
 		port := fmt.Sprintf("dimutex_%v:%v", i+1, i+8080)
 		if int32(i) != c.id {
