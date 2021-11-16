@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"strconv"
 	"time"
@@ -15,6 +16,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+type Server struct {
+	d.UnimplementedDiMutexServer
+}
+
 type diMutexClient struct {
 	cluster   *serf.Serf
 	state     State
@@ -23,6 +28,7 @@ type diMutexClient struct {
 	peers     []d.DiMutexClient //bliver det et problem med denne type som jo ikke har cluster, state osv.?
 	name      string
 	id        int
+	server    *grpc.Server
 }
 
 func main() {
@@ -51,10 +57,19 @@ func main() {
 	c.timestamp = 0
 	c.ctx = context.Background()
 	c.cluster = cluster
-	fmt.Printf("port: %v", cluster.LocalMember().Port)
 	waiter := time.Tick(2 * time.Second)
-	hey := getOtherMembers(cluster)
-	fmt.Print(hey)
+
+	//register the node as a server
+	server := grpc.NewServer()
+	d.RegisterDiMutexServer(server, &Server{})
+	c.server = server
+
+	//listen (attempt to use serf agent port -> might be wrong)
+	listen, err := net.Listen("tcp", strconv.Itoa((int(c.cluster.LocalMember().Port))))
+	if err := server.Serve(listen); err != nil {
+		log.Printf("Node %v failed to serve: %v", c.name, err)
+	}
+
 	select {
 	case <-waiter:
 		setupConnection(&c)
