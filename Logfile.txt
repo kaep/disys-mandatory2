@@ -132,3 +132,9 @@
 
 2021/11/16 10:52:43 Sserver listening on [::]:56544
 2021/11/16 11:19:04 Sserver listening on [::]:8080
+2021/11/16 19:05:39 Server listening on [::]:8080
+2021/11/16 19:06:32 Server listening on [::]:8080
+2021/11/16 19:06:55 jeg er her 
+2021/11/16 19:06:55 Server listening on [::]:8080
+2021/11/16 19:08:27 Server listening on [::]:8080
+2021/11/16 19:08:48 Server listening on [::]:8080

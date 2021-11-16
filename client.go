@@ -44,8 +44,8 @@ func main() {
 	c.state = Released
 	c.timestamp = 0
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	c.ctx = ctx
+	defer cancel()
 
 	//register the node as a server
 	c.server = grpc.NewServer()
@@ -60,12 +60,15 @@ func main() {
 
 	//testkode som sender en grpc request
 	conn, err := grpc.Dial("client-1:8080", grpc.WithInsecure(), grpc.WithBlock())
+	log.Print("sup kings")
+	log.Printf("connection %v", conn)
 	if err != nil {
 		log.Fatalf("Could not connect: %s", err)
 	}
 	clientmand := d.NewDiMutexClient(conn)
 	for {
 		clientmand.Hello(c.ctx, &d.Empty{})
+		clientmand.AnswerRequest(nil, nil)
 	}
 }
 
