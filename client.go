@@ -59,17 +59,20 @@ func main() {
 	go serve(&c, listen)
 
 	//testkode som sender en grpc request
-	conn, err := grpc.Dial("dimutex_1:8080", grpc.WithInsecure(), grpc.WithBlock())
-	log.Print("sup kings")
-	log.Printf("connection %v", conn)
-	if err != nil {
-		log.Fatalf("Could not connect: %s", err)
+	if c.id != 0 {
+		conn, err := grpc.Dial("dimutex_1:8080", grpc.WithInsecure(), grpc.WithBlock())
+		log.Print("sup kings")
+		log.Printf("connection %v", conn)
+		if err != nil {
+			log.Fatalf("Could not connect: %s", err)
+		}
+		clientmand := d.NewDiMutexClient(conn)
+		for {
+			clientmand.Hello(c.ctx, &d.Empty{})
+			clientmand.AnswerRequest(nil, nil)
+		}
 	}
-	clientmand := d.NewDiMutexClient(conn)
-	for {
-		clientmand.Hello(c.ctx, &d.Empty{})
-		clientmand.AnswerRequest(nil, nil)
-	}
+
 }
 
 func serve(c *diMutexClient, listener net.Listener) {
