@@ -59,7 +59,7 @@ func main() {
 	go serve(&c, listen)
 
 	//testkode som sender en grpc request
-	conn, err := grpc.Dial("client-1:8080", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("dimutex_1:8080", grpc.WithInsecure(), grpc.WithBlock())
 	log.Print("sup kings")
 	log.Printf("connection %v", conn)
 	if err != nil {
