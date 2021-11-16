@@ -69,7 +69,7 @@ func main() {
 		clientmand := d.NewDiMutexClient(conn)
 		for {
 			clientmand.Hello(c.ctx, &d.Empty{})
-			clientmand.AnswerRequest(nil, nil)
+			//clientmand.AnswerRequest(nil, nil)
 		}
 	} else {
 		for {
