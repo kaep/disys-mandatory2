@@ -43,13 +43,20 @@ func main() {
 	c.id, _ = strconv.Atoi(os.Getenv("ID"))
 	c.state = Released
 	c.timestamp = 0
-	c.ctx = context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	c.ctx = ctx
 
 	//register the node as a server
-	server := grpc.NewServer()
-	d.RegisterDiMutexServer(server, &Server{})
-	c.server = server
-	go setupServer(&c)
+	c.server = grpc.NewServer()
+	d.RegisterDiMutexServer(c.server, &Server{})
+
+	port := c.id + 8080
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
+	if err != nil {
+		log.Printf("Failed to listen on port %v", listen.Addr())
+	}
+	go serve(&c, listen)
 
 	//testkode som sender en grpc request
 	conn, err := grpc.Dial("client-1:8080", grpc.WithInsecure(), grpc.WithBlock())
@@ -60,20 +67,13 @@ func main() {
 	for {
 		clientmand.Hello(c.ctx, &d.Empty{})
 	}
-
 }
 
-func setupServer(node *diMutexClient) {
-	port := node.id + 8080
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
-	if err != nil {
-		log.Printf("Failed to listen on port %v", listen.Addr())
+func serve(c *diMutexClient, listener net.Listener) {
+	log.Printf("Server listening on %v", listener.Addr())
+	if err := c.server.Serve(listener); err != nil {
+		log.Printf("Node %v failed to serve: %v", c.name, err)
 	}
-	log.Printf("Sserver listening on %v", listen.Addr())
-	if err := node.server.Serve(listen); err != nil {
-		log.Printf("Node %v failed to serve: %v", node.name, err)
-	}
-
 }
 
 func (c *diMutexClient) Hello(in *d.Empty) {
