@@ -71,6 +71,10 @@ func main() {
 			clientmand.Hello(c.ctx, &d.Empty{})
 			clientmand.AnswerRequest(nil, nil)
 		}
+	} else {
+		for {
+
+		}
 	}
 
 }
