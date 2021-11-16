@@ -63,31 +63,7 @@ func main() {
 }
 
 func demo() {
-	//create some demo behavior here
-}
-
-func test(c *diMutexClient) {
-	//testkode som sender en grpc request
-	if c.id != 0 {
-		conn, err := grpc.Dial("dimutex_1:8080", grpc.WithInsecure(), grpc.WithBlock())
-		log.Print("sup kings")
-		log.Printf("connection %v", conn.GetState())
-		if err != nil {
-			log.Fatalf("Could not connect: %s", err)
-		}
-		clientmand := d.NewDiMutexClient(conn)
-		for {
-			_, err := clientmand.Hello(c.ctx, &d.Empty{})
-			if err != nil {
-				log.Fatalf("Der skete en fejl! %v", err)
-			}
-			//clientmand.AnswerRequest(nil, nil)
-		}
-	} else {
-		for {
-
-		}
-	}
+	//create some demo behavior here (for the logs)
 }
 
 func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
@@ -134,7 +110,6 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Em
 		//wait for replies.. might be possible with streaming?
 	}
 
-	//compiler gets happy -> revisit return
 	return &d.Empty{}, nil
 }
 
@@ -207,4 +182,12 @@ func setupConnection(c *diMutexClient) {
 			c.peers[i] = d.NewDiMutexClient(conn)
 		}
 	}
+}
+
+//doesn't get called yet
+func updateLamport(own int32, other int32) int32 {
+	if own >= other {
+		return own + 1
+	}
+	return other + 1
 }
