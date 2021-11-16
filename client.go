@@ -136,6 +136,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.
 	//Release it
 	c.state = Released
 	log.Printf("%v (node %v) has released cs", c.name, c.id)
+	c.replies = 0
 	return &d.Reply{}, nil
 }
 
