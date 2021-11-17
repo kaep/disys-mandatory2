@@ -1,6 +1,8 @@
 # disys-mandatory2
 
-# Clone repo 
-# Run docker compose build, then docker compose up from within the folder
+To start the program: 
+1. Clone the repo 
+2. Change directory to disys-mandatory2 (main dir of the repo)  
+3. Run docker compose up
 
 Many commits, handle it
