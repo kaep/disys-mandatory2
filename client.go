@@ -97,7 +97,6 @@ func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
 	}
 }
 
-//local actions -> OVERVEJ NAVNE
 func GetAccess(message string, c *diMutexClient) {
 	c.timestamp++    //bump logical clock
 	c.state = Wanted //set the state to wanted
@@ -107,7 +106,7 @@ func GetAccess(message string, c *diMutexClient) {
 
 //The "multicast" part of the algorithm
 func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Empty, error) {
-	log.Printf("%v (node %v) requesting access to cs", c.name, c.id)
+	log.Printf("%v (node %v) requesting access to cs at timestamp %v", c.name, c.id, c.timestamp)
 	//bump own clock before sending out the message
 	c.timestamp++
 	//set own state to wanted
@@ -125,13 +124,13 @@ func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Em
 }
 
 func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.Reply, error) {
-	log.Printf("%v (node %v) has gotten access to cs", c.name, c.id)
+	log.Printf("%v (node %v) has gotten access to cs at timestamp %v", c.name, c.id, c.timestamp)
 	c.state = Held
 	//Hold the critical section for 7 seconds
 	time.Sleep(7 * time.Second)
 	//Release it
 	c.state = Released
-	log.Printf("%v (node %v) has released cs", c.name, c.id)
+	log.Printf("%v (node %v) has released cs at timestamp %v", c.name, c.id, c.timestamp)
 	c.replies = 0
 	return &d.Reply{}, nil
 }
@@ -139,7 +138,7 @@ func (c *diMutexClient) HoldAndRelease(ctx context.Context, empty *d.Empty) (*d.
 func (c *diMutexClient) ReplyToQueue() {
 	for i := range c.queue {
 		//reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, c.queue[i]), Lamport: c.timestamp, Id: c.id}
-		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, c.queue[i])
+		log.Printf("%v (node %v) replying to node %v's request at timestamp %v", c.name, c.id, c.queue[i], c.timestamp)
 		c.peers[int(c.queue[i])].Grant(c.ctx, &d.Empty{})
 		//reset queue size
 	}
