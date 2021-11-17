@@ -8,10 +8,7 @@ service DiMutex {
     rpc AnswerRequest (Request) returns (Empty) {} //when a node replies to a request
     rpc HoldAndRelease (Empty) returns (Reply) {} //hold the CS and release int32
     rpc Grant (Empty) returns (Empty) {}
-    rpc Hello (Empty) returns (Empty) {}
 }
-
-//overvej at simplificere til 1 max 2 slags beskeder 
 
 message Request {
     string Message = 1; 

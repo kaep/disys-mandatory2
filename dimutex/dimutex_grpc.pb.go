@@ -22,7 +22,6 @@ type DiMutexClient interface {
 	AnswerRequest(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error)
 	HoldAndRelease(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Reply, error)
 	Grant(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Hello(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type diMutexClient struct {
@@ -69,15 +68,6 @@ func (c *diMutexClient) Grant(ctx context.Context, in *Empty, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *diMutexClient) Hello(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/dimutex.DiMutex/Hello", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // DiMutexServer is the server API for DiMutex service.
 // All implementations must embed UnimplementedDiMutexServer
 // for forward compatibility
@@ -86,7 +76,6 @@ type DiMutexServer interface {
 	AnswerRequest(context.Context, *Request) (*Empty, error)
 	HoldAndRelease(context.Context, *Empty) (*Reply, error)
 	Grant(context.Context, *Empty) (*Empty, error)
-	Hello(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedDiMutexServer()
 }
 
@@ -105,9 +94,6 @@ func (UnimplementedDiMutexServer) HoldAndRelease(context.Context, *Empty) (*Repl
 }
 func (UnimplementedDiMutexServer) Grant(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Grant not implemented")
-}
-func (UnimplementedDiMutexServer) Hello(context.Context, *Empty) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
 }
 func (UnimplementedDiMutexServer) mustEmbedUnimplementedDiMutexServer() {}
 
@@ -194,24 +180,6 @@ func _DiMutex_Grant_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DiMutex_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DiMutexServer).Hello(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/dimutex.DiMutex/Hello",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DiMutexServer).Hello(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // DiMutex_ServiceDesc is the grpc.ServiceDesc for DiMutex service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -234,10 +202,6 @@ var DiMutex_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Grant",
 			Handler:    _DiMutex_Grant_Handler,
-		},
-		{
-			MethodName: "Hello",
-			Handler:    _DiMutex_Hello_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

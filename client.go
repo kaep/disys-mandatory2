@@ -97,12 +97,6 @@ func serve(server *grpc.Server, listener net.Listener, c *diMutexClient) {
 	}
 }
 
-func (c *diMutexClient) Hello(ctx context.Context, in *d.Empty) (*d.Empty, error) {
-	log.Print("HEJSA :)))")
-
-	return &d.Empty{}, nil
-}
-
 //local actions -> OVERVEJ NAVNE
 func GetAccess(message string, c *diMutexClient) {
 	c.timestamp++    //bump logical clock
