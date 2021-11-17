@@ -106,9 +106,9 @@ func GetAccess(message string, c *diMutexClient) {
 
 //The "multicast" part of the algorithm
 func (c *diMutexClient) RequestAccess(ctx context.Context, in *d.Request) (*d.Empty, error) {
-	log.Printf("%v (node %v) requesting access to cs at timestamp %v", c.name, c.id, c.timestamp)
 	//bump own clock before sending out the message
 	c.timestamp++
+	log.Printf("%v (node %v) requesting access to cs at timestamp %v", c.name, c.id, c.timestamp)
 	//set own state to wanted
 	c.state = Wanted
 
