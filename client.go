@@ -180,8 +180,7 @@ func (c *diMutexClient) AnswerRequest(ctx context.Context, request *d.Request) (
 		c.queue = append(c.queue, request.Id)
 	} else {
 		//else, just grant access
-		//reply := d.Reply{Message: fmt.Sprintf("Node %v replying to node %v's request", c.id, request.Id), Lamport: c.timestamp, Id: c.id}
-		log.Printf("%v (node %v) replying to node %v's request", c.name, c.id, request.Id)
+		log.Printf("%v (node %v) replying to node %v's request at timestamp %v", c.name, c.id, request.Id, c.timestamp)
 		c.GrantAccess(ctx, request.Id)
 	}
 	return &d.Empty{}, nil
