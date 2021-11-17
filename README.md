@@ -1,4 +1,5 @@
 # disys-mandatory2
+# daas, lanc & seho
 
 To start the program: 
 1. Clone the repo 
