@@ -65,7 +65,7 @@ func main() {
 func (c *diMutexClient) participate() {
 	for {
 		//to avoid all nodes going str8 for the gold and deadlocking
-		if c.id == 4 {
+		if c.id == 0 {
 			time.Sleep(2 * time.Second)
 		}
 		if c.id == 2 {
