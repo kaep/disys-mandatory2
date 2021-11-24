@@ -5,7 +5,8 @@ services:
         container_name: "dimutex_1"
         image: dimutex:latest
         build: 
-            dockerfile: ./Dockerfile
+            context: ./
+            dockerfile: Dockerfile
         environment: 
             - NAME="Henning"
             - ID=0
@@ -14,7 +15,8 @@ services:
         container_name: "dimutex_2"
         image: dimutex:latest
         build: 
-            dockerfile: ./Dockerfile
+            context: ./
+            dockerfile: Dockerfile
         environment: 
             - NAME="Mikki"
             - ID=1
@@ -23,7 +25,8 @@ services:
         container_name: "dimutex_3"
         image: dimutex:latest
         build: 
-            dockerfile: ./Dockerfile
+            context: ./
+            dockerfile: Dockerfile
         environment: 
             - NAME="Jens"
             - ID=2  
@@ -32,7 +35,8 @@ services:
         container_name: "dimutex_4"
         image: dimutex:latest
         build: 
-            dockerfile: ./Dockerfile
+            context: ./
+            dockerfile: Dockerfile
         environment: 
             - NAME="Børge"        
             - ID=3
