@@ -146,6 +146,7 @@ func (c *diMutexClient) ReplyToQueue() {
 }
 
 func (c *diMutexClient) GrantAccess(ctx context.Context, id int32) {
+	log.Printf("granting access to node %v with ctx %v", id, ctx)
 	_, err := c.peers[int(id)].Grant(ctx, &d.Empty{})
 	if err != nil {
 		log.Fatalf("Error while granting access to node %v: %v", id, err)
