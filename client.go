@@ -59,7 +59,8 @@ func main() {
 
 	//set up connection to peers
 	setupConnection(&c)
-	time.Sleep(2 * time.Second)
+	log.Print("All nodes sleeping for 5 seconds to ensure maximum quality")
+	time.Sleep(5 * time.Second)
 	c.participate()
 }
 
