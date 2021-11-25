@@ -59,6 +59,7 @@ func main() {
 
 	//set up connection to peers
 	setupConnection(&c)
+	time.Sleep(2 * time.Second)
 	c.participate()
 }
 
