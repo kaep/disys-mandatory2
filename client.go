@@ -59,7 +59,7 @@ func main() {
 
 	//set up connection to peers
 	setupConnection(&c)
-	log.Print("All nodes sleeping for 5 seconds to ensure maximum quality")
+	log.Printf("Node %v for 5 seconds to ensure maximum quality", c.id)
 	time.Sleep(5 * time.Second)
 	c.participate()
 }
@@ -148,8 +148,8 @@ func (c *diMutexClient) ReplyToQueue() {
 }
 
 func (c *diMutexClient) GrantAccess(ctx context.Context, id int32) {
-	log.Printf("granting access to node %v with ctx %v", id, ctx)
-	log.Printf("possible nullpointer: %v", c.peers[int(id)])
+	//log.Printf("granting access to node %v with ctx %v", id, ctx) --> for debugging
+	//log.Printf("possible nullpointer: %v", c.peers[int(id)]) --> for debugging
 	_, err := c.peers[int(id)].Grant(ctx, &d.Empty{})
 	if err != nil {
 		log.Fatalf("Error while granting access to node %v: %v", id, err)
